@@ -1,35 +1,44 @@
 module.exports = function (grunt) {
 
-
-    /* Grunt config */
-    /* ============ */
     grunt.initConfig({
+
+        /*
+        * Grab the settings from the package file
+        */
         pkg: grunt.file.readJSON('package.json'),
 
-        /* Linting! */
-        /* ======== */
+        /*
+        * Lint all non-vendor scripts
+        */
         jshint: {
-            options: {
-                jshintrc: true
+            dev: {
+                options: {
+                    jshintrc: true
+                },
+                src: ['app/assets/scripts/**/*.js']    
             },
-            files: ['app/assets/scripts/**/*.js']
+            dist: {
+                options: {
+                    jshintrc: true
+                },
+                src: ['dist/assets/scripts/**/*.js']
+            }
+            
         },
 
-        /* Clean Files! */
-        /* ======== */
+        /*
+        * Kill any generated files
+        */
         clean: {
             dist: {
                 src: ['dist']
             }
         },
 
-        /* Copy Files! */
-        /* ======== */
+        /*
+        * Copy files to the dist folder
+        */
         copy: {
-            // css: {
-            //     src: 'app/assets/css/app.css',
-            //     dest: 'dist/assets/css/app.css'
-            // },
             fonts: {
                 files: [
                     {
@@ -65,8 +74,9 @@ module.exports = function (grunt) {
             }
         },
 
-        /* Concatenation! */
-        /* ============== */
+        /*
+        * Concatenate the script files
+        */
         concat: {
             options: {
                 separator: ';'
@@ -81,8 +91,9 @@ module.exports = function (grunt) {
             }
         },
 
-        /* JS Minification! */
-        /* ============= */
+        /*
+        * JS Minification
+        */
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
@@ -104,16 +115,9 @@ module.exports = function (grunt) {
             }
         },
 
-        /* CSS Minification! */
-        /* ============= */
-        cssmin: {
-            dist: {
-                files: {
-                    'dist/assets/css/app.min.css': ['dist/assets/css/app.css']
-                }
-            }
-        },
-
+        /*
+        * Parse the script tags in the html file
+        */
         processhtml: {
             dist: {
                 files: {
@@ -122,34 +126,18 @@ module.exports = function (grunt) {
             }
         },
 
-        /* Unit testing */
-        /* ============ */
-        karma: {
-            raw: {
-                configFile: 'karma.conf.js',
-                options: {
-                    browsers: ['PhantomJS']
-                }
-            },
-            built: {
-                configFile: 'karma.conf.js',
-                options: {
-                    browsers: ['PhantomJS']
-                }
-            }
-        },
-
-        /* Compass configuration! */
-        /* ====================== */
+        /*
+        * Config compass
+        */
         compass: {
-            dist: {
+            dev: {
                 options: {
                     sassDir: 'scss',
                     cssDir: 'app/assets/css',
                     config: 'config.rb'
                 }
             },
-            prod: {
+            dist: {
                 options: {
                     sassDir: 'scss',
                     cssDir: 'dist/assets/css',
@@ -160,57 +148,67 @@ module.exports = function (grunt) {
             }
         },
 
-        /* Angular template compilation! */
-        /* ============================= */
+        /*
+        * Angular templates
+        */
         ngtemplates: {
-            options: {
-
+            BriocheApp: {
+                module: 'BriocheApp',
+                src: 'app/views/*.html',
+                dest: 'app/assets/scripts/views.js',
+                htmlmin: {
+                  collapseWhitespace: true,
+                  removeComments: true
+                },
                 url: function (url) {
                     var name = url.split('/');
                     return name[name.length - 1];
                 }
-            },
-            BriocheApp: {
-                module: 'BriocheApp',
-                src: 'app/views/*.html',
-                dest: 'app/assets/scripts/views.js'
             }
         },
 
-        /* Watch task!
-         /* ========================= */
+        /*
+        * Tasks instigated by 'grunt watch'
+        */
         watch: {
             sass: {
                 files: ['scss/**/*.scss'],
-                tasks: ['compass:dist']
+                tasks: ['compass:dev']
             },
             angular: {
                 files: ['app/views/**/*.html'],
                 tasks: ['ngtemplates']
+            },
+            lint: {
+                files: ['/app/assets/scripts/**/*.js'],
+                tasks: ['jshint:dev']
             }
         }
     });
 
-    /* Register the tasks we want grunt to actually use
-     /* ========================= */
+    /*
+    * Register the common grunt tasks
+    */
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-compass');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('grunt-processhtml');
 
-    /* TASK ALIASES */
-    grunt.registerTask('build', [ 'clean', 'jshint', /*'karma:raw',*/ 'ngtemplates', 'compass:prod', 'copy', 'concat', 'uglify', 'processhtml' ]);
+    /*
+    * Task aliases
+    */
+    grunt.registerTask('build', [ 'clean', 'jshint:dev', 'ngtemplates', 'compass:dist', 'copy', 'concat', 'uglify', 'processhtml' ]);
+    grunt.registerTask('lint', [ 'jshint:dev' ]);
     grunt.registerTask('templates', [ 'ngtemplates' ]);
 
-    /* Running GRUNT without any parameters will run the following tasks
-     /* ========================= */
+    /*
+    * Running grunt with no parameters will run the following tasks
+    */
     grunt.registerTask('default', [ 'build' ]);
-
 };
