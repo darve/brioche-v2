@@ -1,22 +1,12 @@
 {
-  "name": "brioche",
-  "version": "0.0.0",
-  "description": "Brioche V2 =======",
+  "name": "Brioche",
+  "version": "2.0.0",
+  "description": "Powerful Node / Angular / Grunt boilerplate",
   "appName": "BriocheApp",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/darve/brioche-v2.git"
   },
-  "author": "",
-  "license": "BSD-2-Clause",
-  "bugs": {
-    "url": "https://github.com/darve/brioche/issues"
-  },
-  "homepage": "https://github.com/darve/brioche-v2",
   "dependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "~0.2.2",
@@ -29,6 +19,8 @@
     "grunt-contrib-cssmin": "~0.9.0",
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-processhtml": "~0.3.0"
+    "grunt-processhtml": "~0.3.0",
+    "mongoose" :  "3.6.x",
+    "express"  :  "3.2.x"
   }
 }
